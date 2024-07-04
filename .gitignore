@@ -1,9 +1,0 @@
-
-
-*.env
-# Ignora tutti i file .env nella cartella client/src
-client/src/*.env
-
-# Ignora tutti i file .env nella cartella server
-server/*.env
-

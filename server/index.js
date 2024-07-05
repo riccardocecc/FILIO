@@ -7,7 +7,7 @@ require('dotenv').config();
 const port = process.env.PORT;
 
 const openai = new OpenAI({
-    apiKey: 'sk-proj-ve4Iz3OiVOq5gDTTSMYJT3BlbkFJCrbnnUpzBxztnXDaunmf'
+    apiKey: process.env.OPEN_AI_API
 });
 app.use(cors());
 

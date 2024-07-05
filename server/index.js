@@ -125,7 +125,9 @@ async function queryFormulation(){
     
     return questionCompletion.choices[0].message.content.trim();
 }
-
+app.get("/", (req, res) => {
+  res.send("Welcome to filio");
+});
 app.get("/bookSuggestion", async (req, res) => {
     
     try {

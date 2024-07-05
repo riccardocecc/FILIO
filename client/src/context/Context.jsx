@@ -27,26 +27,37 @@ const ContextProvider = (props) => {
         setShowResult(true)
         setRecentPrompt(input)
 
-        if(questionsCount <= 1){
-            setPrevPrompt(prev=>[...prev,input])
-            setQuestionCount(questionsCount + 1);
+       
+            setPrevPrompt(prev => [...prev, input]);
             try {
-                setBookSuggestion([])
-                const response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input });
-                console.log(response);
-                setResultQuestion(response.data);
+                setBookSuggestion([]);
+                const response = await axios.post('http://localhost:5000/questionDeeper', { input });
+                console.log("response", response);
+                console.log("count", questionsCount);
+                setQuestionCount(questionsCount + 1);
+                if(questionsCount===2){
+                    const response = await axios.get('http://localhost:5000/bookSuggestion');
+                    console.log("FRONT", response.data);
+                    setBookSuggestion(response.data);
+                    setQuestionCount(0);
+                }else{
+                    setResultQuestion(response.data);
+                }
+                
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
                 setLoading(false);
                 setInput("");
             }
-        }else{
-            setPrevPrompt(prev=>[...prev,input])
+     
+        
+       /* if (questionsCount >= 3) {
+            setPrevPrompt(prev => [...prev, input]);
             setQuestionCount(questionsCount + 1);
             try {
-                const response = await axios.get('https://filio-server.vercel.app/bookSuggestion');
-                console.log("FRONT", response.data)
+                const response = await axios.get('http://localhost:5000/bookSuggestion');
+                console.log("FRONT", response.data);
                 setBookSuggestion(response.data);
                 setQuestionCount(0);
             } catch (error) {
@@ -55,7 +66,8 @@ const ContextProvider = (props) => {
                 setLoading(false);
                 setInput("");
             }
-        }
+        }*/
+        
        
         
     }

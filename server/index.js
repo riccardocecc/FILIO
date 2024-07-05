@@ -4,10 +4,10 @@ const cors = require('cors');
 const axios = require('axios')
 const app = express();
 require('dotenv').config();
-const port = 5000;
+const port = process.env.PORT;
 
 const openai = new OpenAI({
-    apiKey: process.env.OPEN_AI_API
+    apiKey: 'sk-proj-ve4Iz3OiVOq5gDTTSMYJT3BlbkFJCrbnnUpzBxztnXDaunmf'
 });
 app.use(cors());
 
@@ -18,16 +18,16 @@ function get_book_info(book_name, author_name){
     let  bookInfo = {
      book_name:book_name,
      author_name:author_name,
-     coverUrl:null,
+     coverUrl:"null",
          publication: "2018",
-         description: null
+         description: "no description yet"
          
      }
      return bookInfo
 }
 
 
-  /*async function searchBook(title) {
+  async function searchBook(title) {
     const apiKey = process.env.GOOGLE_API;  // Sostituisci con la tua API key
     const url = 'https://www.googleapis.com/books/v1/volumes';
     const query = title;
@@ -55,7 +55,7 @@ function get_book_info(book_name, author_name){
                 const publishedDate = new Date(info.publishedDate);
                 if (!latestPublishedDate || publishedDate > latestPublishedDate) {
                     latestPublishedDate = publishedDate;
-                    console.log(info)
+                   
                     foundBook = {
                         thumbnail: info.imageLinks.thumbnail,
                         description: info.description
@@ -73,7 +73,7 @@ function get_book_info(book_name, author_name){
         console.error('Error fetching data from Google Books API', error);
         return 'Error fetching data from Google Books API';
     }
-}*/
+}
 
   const chatHistory = []
 
@@ -81,7 +81,6 @@ app.post("/questionDeeper", async (req, res) => {
     
     try {
         const userPrompt = req.body.input;
-        chatHistory.push(['user', userPrompt]);
         const messages = chatHistory.map(([role, content]) => ({
             role,
             content,
@@ -97,14 +96,35 @@ app.post("/questionDeeper", async (req, res) => {
           });
         
         const followUpQuestion = questionCompletion.choices[0].message.content.trim();
-        chatHistory.push(['assistant', followUpQuestion]);
         chatHistory.push(['user', userPrompt]);
+        chatHistory.push(['assistant', followUpQuestion]);
         res.json(followUpQuestion); 
     } catch (error) {
         console.error(error);
         res.status(500).send('Errore del server: ' + error.message);
     }
 });
+
+async function queryFormulation(){
+    const finalMessages = chatHistory.map(([role, content]) => ({
+        role,
+        content,
+      }));
+
+      finalMessages.push({
+        role: 'system',
+        content: `Analizza bene la conversazione tra system e user per la scelta di un libro e sulla base di questo formula una frase che puoi utilizzare
+        per la sua richiesta.`,
+      });
+
+      const questionCompletion = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: finalMessages,
+        max_tokens:100
+      });
+    
+    return questionCompletion.choices[0].message.content.trim();
+}
 
 app.get("/bookSuggestion", async (req, res) => {
     
@@ -118,7 +138,7 @@ app.get("/bookSuggestion", async (req, res) => {
             role: 'system',
             content: `Sulla base della conversazione consiglia 3 libri che si trovano su amazon dando solo il nome e l'autore .`,
           });
-         //console.log(finalMessages)
+         console.log(finalMessages)
           const tools = [
             {
               type: "function",
@@ -157,15 +177,12 @@ app.get("/bookSuggestion", async (req, res) => {
           const bookInfoPromises = toolCalls.map(async (toolCall) => {
             if (toolCall.type === 'function' && toolCall.function.name === 'get_book_info') {
                 const args = JSON.parse(toolCall.function.arguments);
-                console.log('Args:', args); // Log arguments to check if they're correct
-                //const coverUrl = await searchBook(args.book_name);
-                console.log('Cover URL:', coverUrl); // Log cover URL to check the result from searchBook
-                return get_book_info(args.book_name, args.author_name, null, null);
+                //const bookDetails = await searchBook(args.book_name);
+                return get_book_info(args.book_name, args.author_name);
             }
         });
 
         const books = await Promise.all(bookInfoPromises);
-        console.log('Books:', books); // Log final books array to check if we have all books
 
         res.json(books);
         

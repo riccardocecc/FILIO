@@ -32,13 +32,11 @@ const ContextProvider = (props) => {
             try {
                 setBookSuggestion([]);
                 const response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input });
-                console.log("response", response);
-                console.log("count", questionsCount);
                 setQuestionCount(questionsCount + 1);
                 if(questionsCount===2){
                     const response = await axios.get('https://filio-server.vercel.app/bookSuggestion');
-                    console.log("FRONT", response.data);
                     setBookSuggestion(response.data);
+                    setResultQuestion([])
                     setQuestionCount(0);
                 }else{
                     setResultQuestion(response.data);

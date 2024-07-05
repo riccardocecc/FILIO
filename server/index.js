@@ -14,20 +14,20 @@ app.use(cors());
 // Middleware per parsing del JSON
 app.use(express.json());
 
-function get_book_info(book_name, author_name, cover_url,book_description){
+function get_book_info(book_name, author_name){
     let  bookInfo = {
      book_name:book_name,
      author_name:author_name,
-     coverUrl:cover_url,
+     coverUrl:null,
          publication: "2018",
-         description: book_description
+         description: null
          
      }
      return bookInfo
-  }
+}
 
 
-  async function searchBook(title) {
+  /*async function searchBook(title) {
     const apiKey = process.env.GOOGLE_API;  // Sostituisci con la tua API key
     const url = 'https://www.googleapis.com/books/v1/volumes';
     const query = title;
@@ -73,7 +73,7 @@ function get_book_info(book_name, author_name, cover_url,book_description){
         console.error('Error fetching data from Google Books API', error);
         return 'Error fetching data from Google Books API';
     }
-}
+}*/
 
   const chatHistory = []
 
@@ -158,9 +158,9 @@ app.get("/bookSuggestion", async (req, res) => {
             if (toolCall.type === 'function' && toolCall.function.name === 'get_book_info') {
                 const args = JSON.parse(toolCall.function.arguments);
                 console.log('Args:', args); // Log arguments to check if they're correct
-                const coverUrl = await searchBook(args.book_name);
+                //const coverUrl = await searchBook(args.book_name);
                 console.log('Cover URL:', coverUrl); // Log cover URL to check the result from searchBook
-                return get_book_info(args.book_name, args.author_name, coverUrl.thumbnail, coverUrl.description);
+                return get_book_info(args.book_name, args.author_name, null, null);
             }
         });
 

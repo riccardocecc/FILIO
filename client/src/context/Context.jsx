@@ -31,12 +31,12 @@ const ContextProvider = (props) => {
             setPrevPrompt(prev => [...prev, input]);
             try {
                 setBookSuggestion([]);
-                const response = await axios.post('https://filio-server-riccardo-ceccaranis-projects.vercel.app/questionDeeper', { input });
+                const response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input });
                 console.log("response", response);
                 console.log("count", questionsCount);
                 setQuestionCount(questionsCount + 1);
                 if(questionsCount===2){
-                    const response = await axios.get('https://filio-server-riccardo-ceccaranis-projects.vercel.app/bookSuggestion');
+                    const response = await axios.get('https://filio-server.vercel.app/bookSuggestion');
                     console.log("FRONT", response.data);
                     setBookSuggestion(response.data);
                     setQuestionCount(0);
@@ -51,22 +51,7 @@ const ContextProvider = (props) => {
                 setInput("");
             }
      
-        
-       /* if (questionsCount >= 3) {
-            setPrevPrompt(prev => [...prev, input]);
-            setQuestionCount(questionsCount + 1);
-            try {
-                const response = await axios.get('http://localhost:5000/bookSuggestion');
-                console.log("FRONT", response.data);
-                setBookSuggestion(response.data);
-                setQuestionCount(0);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            } finally {
-                setLoading(false);
-                setInput("");
-            }
-        }*/
+    
         
        
         

@@ -21,27 +21,9 @@ function Main() {
         ?<>
         <div className="greet">
             <p><span>Hello, Reader.</span></p>
-            <p>Hoq can i help you today?</p>
+            <p>How can i help you today?</p>
         </div>
-        <div className='cards'>
-
-            <div className="card">
-                <p>Suggest beautfiul places to see on an </p>
-                <img src={assets.compass_icon} alt="" srcset="" />
-            </div>
-            <div className="card">
-                <p>Suggest beautfiul places to see on an </p>
-                <img src={assets.bulb_icon} alt="" srcset="" />
-            </div>
-            <div className="card">
-                <p>Suggest beautfiul places to see on an </p>
-                <img src={assets.bulb_icon} alt="" srcset="" />
-            </div>
-            <div className="card">
-                <p>Suggest beautfiul places to see on an </p>
-                <img src={assets.bulb_icon} alt="" srcset="" />
-            </div>
-        </div>
+       
         </>:
         <div className='result'>
             <div className="result-title">
@@ -70,13 +52,13 @@ function Main() {
         }
         <div className="main-bottom">
             <div className="search-box">
-                <input onChange={(e)=>setInput(e.target.value)} value={input} type="text" placeholder='Enter prompt here' />
+                <input onChange={(e)=>setInput(e.target.value)} value={input} type="text" placeholder='write a message' />
                 <div>
                     <img onClick={()=>onSent()}  src={assets.send_icon} alt="" />
                 </div>
             </div>
             <p className="bottom-info">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus officiis est voluptates fugit velit, incidunt quis rerum illum porro explicabo eos id? Pariatur, animi cumque velit accusantium asperiores quam fugiat.
+            Discover the perfect book for every mood and preference! Folio offers personalized reading suggestions tailored to your emotions and requests, providing you with a unique reading experience.
             </p>
         </div>
       </div>

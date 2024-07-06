@@ -14,7 +14,7 @@ const openai = new OpenAI({
     apiKey: process.env.OPEN_AI_API
 });
 app.use(cors({
-  origin: 'http://localhost:5173', // Sostituisci con l'URL del tuo client
+  origin: 'https://filio-client.vercel.app/', // Sostituisci con l'URL del tuo client
   credentials: true
 }));
 

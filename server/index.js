@@ -15,6 +15,7 @@ const openai = new OpenAI({
 });
 app.use(cors({
   origin: 'https://filio-client.vercel.app', // Sostituisci con l'URL del tuo client
+ //  origin:'http://localhost:5173',
   credentials: true
 }));
 
@@ -137,45 +138,30 @@ app.post("/questionDeeper", async (req, res) => {
     }
 });
 
-async function queryFormulation(req){
-  
-  const chatHistory = req.session.chat;
-    const finalMessages = chatHistory.map(([role, content]) => ({
-        role,
-        content,
-      }));
 
-      finalMessages.push({
-        role: 'system',
-        content: `Esamina attentamente la conversazione tra il sistema e l'utente per identificare le preferenze di lettura dell'utente. In base a queste preferenze, genera una frase concisa e diretta che l'utente può usare per richiedere il libro ideale.Sii diretto`,
-      });
-
-      const questionCompletion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: finalMessages,
-        temperature: 0.2
-      });
-    req.session.chat = [];
-
-    return questionCompletion.choices[0].message.content.trim();
-}
 app.get("/", (req, res) => {
   res.send("Welcome to folio");
 });
 
 
-
-
 app.get("/bookSuggestion", async (req, res) => {
     
     try {
-      
-      const query = await queryFormulation(req)
+    
+         const chatHistory = req.session.chat
          
-          const message=[{
-            role:'system',
-            content:` ${query} consigliami 3 libri che si trovano su Amazon dando solo il nome e l'auotre`
-          }]
+            const finalMessages = chatHistory.map(([role, content]) => ({
+              role,
+              content,
+            }));
+
+            finalMessages.pop();
+
+            finalMessages.push({
+              role: 'system',
+              content: `Esamina attentamente la conversazione tra assistant e user per identificare le preferenze di lettura dell'utente consiglia e 3 libri che si trovano su Amazon dando solo il nome e l'auotre`,
+            });
+            console.log("After push", finalMessages)
         
           const tools = [
             {
@@ -204,7 +190,7 @@ app.get("/bookSuggestion", async (req, res) => {
           const recommendationCompletion = await openai.chat.completions.create({
             //model: 'gpt-3.5-turbo-0125',
             model:'gpt-3.5-turbo-0125',
-            messages: message,
+            messages: finalMessages,
             temperature:0,
             tools:tools,
             tool_choice:"auto"

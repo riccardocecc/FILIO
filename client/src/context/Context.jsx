@@ -31,12 +31,16 @@ const ContextProvider = (props) => {
             setPrevPrompt(prev => [...prev, input]);
             try {
                 setBookSuggestion([]);
-                const response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input });
-                setQuestionCount(questionsCount + 1);
+                //const response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input });
+                let response = null;
+                
+                 response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input },{ withCredentials: true });
+                
+                 setQuestionCount(questionsCount + 1);
                 if(questionsCount===2){
-                    const response = await axios.get('https://filio-server.vercel.app/bookSuggestion');
+                    response = await axios.get('https://filio-server.vercel.app/bookSuggestion',{ withCredentials: true });
                     setBookSuggestion(response.data);
-                    setResultQuestion([])
+                    
                     setQuestionCount(0);
                 }else{
                     setResultQuestion(response.data);
@@ -48,12 +52,8 @@ const ContextProvider = (props) => {
                 setLoading(false);
                 setInput("");
             }
-     
-    
-        
-       
-        
     }
+
  
 
     const contextValue = {

@@ -8,7 +8,6 @@ function Main() {
 
     const {onSent, recentPrompt, showResult, loading, resultData,setInput, input,bookSuggestion,questionsCount} = useContext(Context)
 
-    console.log("Books",bookSuggestion)
 
   return (
     <div className='main'>
@@ -52,13 +51,13 @@ function Main() {
         }
         <div className="main-bottom">
             <div className="search-box">
-                <input onChange={(e)=>setInput(e.target.value)} value={input} type="text" placeholder='write a message' />
+                <input onChange={(e)=>setInput(e.target.value)} value={input} type="text" placeholder='Enter prompt here' />
                 <div>
                     <img onClick={()=>onSent()}  src={assets.send_icon} alt="" />
                 </div>
             </div>
             <p className="bottom-info">
-            Discover the perfect book for every mood and preference! Folio offers personalized reading suggestions tailored to your emotions and requests, providing you with a unique reading experience.
+            Scopri il libro ideale per ogni tuo stato d'animo e preferenza! Folio ti suggerisce letture personalizzate in base al tuo mood e alle tue richieste, per un'esperienza di lettura unica.
             </p>
         </div>
       </div>

@@ -209,6 +209,7 @@ app.get("/bookSuggestion", async (req, res) => {
         const books = await Promise.all(bookInfoPromises);
 
         res.json(books);
+        req.session.chat=[];
         
 
     } catch (error) {

@@ -157,10 +157,11 @@ app.get("/bookSuggestion", async (req, res) => {
 
             finalMessages.pop();
 
-            finalMessages.push({
+            const message=[{
               role: 'system',
-              content: `Esamina attentamente la conversazione tra assistant e user per identificare le preferenze di lettura dell'utente consiglia e 3 libri che si trovano su Amazon dando solo il nome e l'auotre`,
-            });
+              content: `Esamina attentamente questa conversazione tra assistant e user: ${finalMessages} e identifica cosa vuole leggere ponendo attenzione al primo messaggio
+              che chiede all'assistant e come risponde. Consiglia quindi 3 libri presi da Amazon restituendo solo titolo e autore`,
+            }];
             console.log("After push", finalMessages)
         
           const tools = [

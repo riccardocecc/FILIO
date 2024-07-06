@@ -15,7 +15,7 @@ const openai = new OpenAI({
 });
 app.use(cors({
   origin: 'https://filio-client.vercel.app', // Sostituisci con l'URL del tuo client
- //  origin:'http://localhost:5173',
+  //origin:'http://localhost:5173',
   credentials: true
 }));
 
@@ -121,8 +121,9 @@ app.post("/questionDeeper", async (req, res) => {
             content: `Sulla base di questo "${userPrompt}", fai UNA sola domanda specfica per capire effettivamente quale libro vuole leggere, ma non dare il libro ancora`,
         });
         const questionCompletion = await openai.chat.completions.create({
-            model: 'gpt-4o',
+            model: 'gpt-4-turbo',
             messages: messages,
+            temperature:0.2,
             max_tokens:100
           });
         
@@ -157,11 +158,10 @@ app.get("/bookSuggestion", async (req, res) => {
 
             finalMessages.pop();
 
-            const message=[{
+            finalMessages.push({
               role: 'system',
-              content: `Esamina attentamente questa conversazione tra assistant e user: ${finalMessages} e identifica cosa vuole leggere ponendo attenzione al primo messaggio
-              che chiede all'assistant e come risponde. Consiglia quindi 3 libri presi da Amazon restituendo solo titolo e autore`,
-            }];
+              content: `Esamina attentamente la conversazione tra assistant e user ponendo attenzione alla richiesta e risposta dell'user all'assistant e consiglia 3 libri che si trovano su Amazon dando solo il nome e l'autore`,
+            });
             console.log("After push", finalMessages)
         
           const tools = [
@@ -191,7 +191,7 @@ app.get("/bookSuggestion", async (req, res) => {
           const recommendationCompletion = await openai.chat.completions.create({
             //model: 'gpt-3.5-turbo-0125',
             model:'gpt-3.5-turbo-0125',
-            messages: message,
+            messages: finalMessages,
             temperature:0,
             tools:tools,
             tool_choice:"auto"

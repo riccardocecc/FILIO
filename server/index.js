@@ -191,7 +191,7 @@ app.get("/bookSuggestion", async (req, res) => {
           const recommendationCompletion = await openai.chat.completions.create({
             //model: 'gpt-3.5-turbo-0125',
             model:'gpt-3.5-turbo-0125',
-            messages: finalMessages,
+            messages: message,
             temperature:0,
             tools:tools,
             tool_choice:"auto"

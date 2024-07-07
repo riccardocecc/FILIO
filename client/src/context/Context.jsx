@@ -34,17 +34,17 @@ const ContextProvider = (props) => {
                 //const response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input });
                 let response = null;
                 
-                 response = await axios.post('https://filio-server.vercel.app/questionDeeper', { input },{ withCredentials: true });
+              
                 
-                 setQuestionCount(questionsCount + 1);
-                if(questionsCount===2){
-                    response = await axios.get('https://filio-server.vercel.app/bookSuggestion',{ withCredentials: true });
+                    
+               
+                    response = await axios.post('https://filio-server.vercel.app/bookSuggestion', { input },{ withCredentials: true });
                     setBookSuggestion(response.data);
                     
-                    setQuestionCount(0);
-                }else{
-                    setResultQuestion(response.data);
-                }
+                    
+               
+                 
+                
                 
             } catch (error) {
                 console.error("Error fetching data:", error);

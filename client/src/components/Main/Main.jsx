@@ -39,13 +39,9 @@ function Main() {
                 </div>
                 
                 :<div className='result'>
-                    <p>{questionsCount}/2</p>
-                    <p >{resultData}</p>
+                  <BooksList books={bookSuggestion} />
                  </div>}
-                {bookSuggestion!=null?
-                    <BooksList books={bookSuggestion} />
-                    :null
-                }
+                
             </div>
         </div>
         }

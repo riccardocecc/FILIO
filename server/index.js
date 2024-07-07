@@ -44,13 +44,13 @@ app.use((req, res, next) => {
 
 
 
-function get_book_info(book_name, author_name){
+function get_book_info(book_name, author_name,choice_description){
     let  bookInfo = {
      book_name:book_name,
      author_name:author_name,
      coverUrl:"null",
          publication: "2018",
-         description: "no description yet"
+         description: choice_description
          
      }
      return bookInfo
@@ -107,37 +107,7 @@ function get_book_info(book_name, author_name){
 
 
 
-app.post("/questionDeeper", async (req, res) => {
-    
-    try {
-        const userPrompt = req.body.input;
-        const chatHistory = req.session.chat;
-        const messages = chatHistory.map(([role, content]) => ({
-            role,
-            content,
-        }));
-        messages.push({
-            role: 'system',
-            content: `Sulla base di questo "${userPrompt}", fai UNA sola domanda specfica per capire effettivamente quale libro vuole leggere, ma non dare il libro ancora`,
-        });
-        const questionCompletion = await openai.chat.completions.create({
-            model: 'gpt-4-turbo',
-            messages: messages,
-            temperature:0.2,
-            max_tokens:100
-          });
-        
-        const followUpQuestion = questionCompletion.choices[0].message.content.trim();
-        chatHistory.push(['user', userPrompt]);
-        chatHistory.push(['assistant', followUpQuestion]);
-        req.session.chat = chatHistory;
-        
-        res.json(followUpQuestion); 
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Errore del server: ' + error.message);
-    }
-});
+
 
 
 app.get("/", (req, res) => {
@@ -145,53 +115,56 @@ app.get("/", (req, res) => {
 });
 
 
-app.get("/bookSuggestion", async (req, res) => {
+app.post("/bookSuggestion", async (req, res) => {
     
     try {
     
-         const chatHistory = req.session.chat
-         
-            const finalMessages = chatHistory.map(([role, content]) => ({
-              role,
-              content,
-            }));
+      const userPrompt = req.body.input;
+      const chatHistory = req.session.chat;
+      const messages = chatHistory.map(([role, content]) => ({
+          role,
+          content,
+      }));
+      chatHistory.push(['user', userPrompt]);
+      const input = [{
+          role: 'system',
+          content: `Sei un assistente che consiglia libri da leggere. Analizzando questa frase "${userPrompt}", consiglia TRE libri da Amazon`,
+      }];
 
-            finalMessages.pop();
-
-            finalMessages.push({
-              role: 'system',
-              content: `Esamina attentamente la conversazione tra assistant e user ponendo attenzione alla richiesta e risposta dell'user all'assistant e consiglia 3 libri che si trovano su Amazon dando solo il nome e l'autore`,
-            });
-            console.log("After push", finalMessages)
+      
+            console.log("After push", messages)
         
           const tools = [
             {
               type: "function",
               function: {
                 name: "get_book_info",
-                description: "Get book information about the book",
+                description: "Get information about the book and why it was chosen",
                 parameters: {
                   type: "object",
                   properties: {
                     book_name: {
                       type: "string",
-                      description: "The name of the book, e.g. 'Moby Dick' ",
+                      description: "The name of the book, e.g. 'Interazione del colore' ",
                     },
                     author_name: {
                         type: "string",
-                        description: "The name of the author, e.g. 'Herman Melville'",
+                        description: "The name of the author, e.g. 'Josef Albers'",
                     },
+                    choice_description: {
+                      type: "string",
+                      description: "why it was chosen, e.g. 'A classic in the field of art and design, exploring how colors interact with each other and how we perceive these emotions'",
+                  }
                   },
-                  required: ["book_name","author_name"],
+                  required: ["book_name","author_name","choice_description"],
                 },
               },
             },
           ];
           // Call the API for the final recommendation
           const recommendationCompletion = await openai.chat.completions.create({
-            //model: 'gpt-3.5-turbo-0125',
-            model:'gpt-3.5-turbo-0125',
-            messages: finalMessages,
+            model: 'gpt-3.5-turbo-0125',
+            messages: input,
             temperature:0,
             tools:tools,
             tool_choice:"auto"
@@ -201,15 +174,16 @@ app.get("/bookSuggestion", async (req, res) => {
           const bookInfoPromises = toolCalls.map(async (toolCall) => {
             if (toolCall.type === 'function' && toolCall.function.name === 'get_book_info') {
                 const args = JSON.parse(toolCall.function.arguments);
+                console.log(args);
                 //const bookDetails = await searchBook(args.book_name);
-                return get_book_info(args.book_name, args.author_name);
+                return get_book_info(args.book_name, args.author_name, args.choice_description);
             }
         });
 
         const books = await Promise.all(bookInfoPromises);
-
+        req.session.chat = chatHistory;
         res.json(books);
-        req.session.chat=[];
+        
         
 
     } catch (error) {

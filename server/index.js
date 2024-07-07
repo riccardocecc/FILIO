@@ -132,7 +132,7 @@ app.post("/bookSuggestion", async (req, res) => {
       }];
 
       
-            console.log("After push", messages)
+            console.log("After push", messages + userPrompt)
         
           const tools = [
             {

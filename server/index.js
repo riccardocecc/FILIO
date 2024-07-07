@@ -139,7 +139,7 @@ app.post("/bookSuggestion", async (req, res) => {
               type: "function",
               function: {
                 name: "get_book_info",
-                description: "Get information about the book and why it was chosen",
+                description: "Get information about the book and why it was chosen.Write according to the language spoken by the user",
                 parameters: {
                   type: "object",
                   properties: {

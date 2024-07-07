@@ -131,8 +131,9 @@ app.post("/bookSuggestion", async (req, res) => {
           content: `Sei un assistente che consiglia libri da leggere. Analizzando questa frase "${userPrompt}", consiglia TRE libri da Amazon`,
       }];
 
-      
-            console.log("After push", messages + userPrompt)
+
+      console.log(" userPrompt: " + userPrompt + "After push: " + messages);
+
         
           const tools = [
             {

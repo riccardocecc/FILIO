@@ -19,8 +19,8 @@ function Main() {
         {!showResult
         ?<>
         <div className="greet">
-            <p><span>Hello, Reader.</span></p>
-            <p>How can i help you today?</p>
+        {/*<p><span>Hello, Reader.</span></p> */}
+            <p>What you would like to read about ?</p>
         </div>
        
         </>:

@@ -12,7 +12,7 @@ function Main() {
   return (
     <div className='main'>
       <div className="nav">
-        <p>Folio</p>
+       <a href='https://filio-client.vercel.app/'> <p>Folio</p></a>
         <img src={assets.user_icon} alt="" srcset="" />
       </div>
       <div className="main-container">

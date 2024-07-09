@@ -126,10 +126,12 @@
     overflow-y:scroll ;
 }
 
-.result::-webkit-scrollbar{
+.result::-webkit-scrollbar {
     display: none;
 }
-
+.result {
+    scrollbar-width: none; /* for Firefox */
+}
 .result-title{
     margin: 40px 0px;
     display: flex;

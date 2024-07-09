@@ -5,8 +5,9 @@ const axios = require('axios')
 const app = express();
 const session = require('express-session');
 const uuid = require('uuid');
+const LanguageDetect = require('languagedetect');
 require('dotenv').config();
-
+const lngDetector = new LanguageDetect();
 
 const port = process.env.PORT;
 
@@ -44,15 +45,14 @@ app.use((req, res, next) => {
 
 
 
-function get_book_info(book_name, author_name,choice_description){
-    let  bookInfo = {
-     book_name:book_name,
-     author_name:author_name,
-     coverUrl:"null",
-         publication: "2018",
-         description: choice_description
-         
-     }
+function get_book_info(book_name, author_name,choice_description, book_cover){
+      let  bookInfo = {
+          book_name:book_name,
+          author_name:author_name,
+          coverUrl:book_cover,
+          publication: "2018",
+          description: choice_description
+      }
      return bookInfo
 }
 
@@ -60,8 +60,8 @@ function get_book_info(book_name, author_name,choice_description){
   async function searchBook(title) {
     const apiKey = process.env.GOOGLE_API;  // Sostituisci con la tua API key
     const url = 'https://www.googleapis.com/books/v1/volumes';
-    const query = title;
-
+    //const query = `${title}+inauthor:${author}`
+    const query = title
     try {
         const response = await axios.get(url, {
             params: {
@@ -81,14 +81,12 @@ function get_book_info(book_name, author_name,choice_description){
             const hasDescription = info.description
             const hasEnglish = info.language=== 'en';
             
-            if (titleMatch && hasThumbnail && hasDescription && hasEnglish) {
+            if (titleMatch  && hasThumbnail && hasDescription && hasEnglish) {
                 const publishedDate = new Date(info.publishedDate);
                 if (!latestPublishedDate || publishedDate > latestPublishedDate) {
                     latestPublishedDate = publishedDate;
-                   
                     foundBook = {
                         thumbnail: info.imageLinks.thumbnail,
-                        description: info.description
                     };
                 }
             }
@@ -128,7 +126,7 @@ app.post("/bookSuggestion", async (req, res) => {
       chatHistory.push(['user', userPrompt]);
       const input = [{
           role: 'system',
-          content: `Sei un assistente che consiglia libri da leggere. Analizzando questa frase "${userPrompt}", consiglia TRE libri da Amazon`,
+          content: `You are an assistant who recommends books to read. Analyzing this sentence "${userPrompt}", recommends THREE books from Amazon. `,
       }];
 
 
@@ -140,7 +138,7 @@ app.post("/bookSuggestion", async (req, res) => {
               type: "function",
               function: {
                 name: "get_book_info",
-                description: "Get information about the book and why it was chosen.Write according to the language spoken by the user",
+                description: `Get information about the book and why it was chosen.`,
                 parameters: {
                   type: "object",
                   properties: {
@@ -175,9 +173,10 @@ app.post("/bookSuggestion", async (req, res) => {
           const bookInfoPromises = toolCalls.map(async (toolCall) => {
             if (toolCall.type === 'function' && toolCall.function.name === 'get_book_info') {
                 const args = JSON.parse(toolCall.function.arguments);
-                console.log(args);
-                //const bookDetails = await searchBook(args.book_name);
-                return get_book_info(args.book_name, args.author_name, args.choice_description);
+                
+                const bookDetails = await searchBook(args.book_name);
+               
+                return get_book_info(args.book_name, args.author_name, args.choice_description, bookDetails.thumbnail);
             }
         });
 
